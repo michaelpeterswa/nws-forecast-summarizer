@@ -1,0 +1,46 @@
+---
+version: "3.3"
+
+services:
+  main:
+    build: .
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      LOG_LEVEL: debug
+      API_HOST: 0.0.0.0
+      API_PORT: 8080
+      METRICS_HOST: 0.0.0.0
+      METRICS_PORT: 8081
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  tempo:
+    image: grafana/tempo:latest
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./docker/tempo/tempo.yml:/etc/tempo.yaml
+      - /tmp/tempo-data:/tmp/tempo
+    ports:
+      - "4317:4317" # otlp grpc
+      - "4318:4318" # otlp http
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./docker/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ./docker/grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/main.yaml
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    ports:
+      - "3000:3000"

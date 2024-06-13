@@ -1,0 +1,9 @@
+---
+extends: default
+
+rules:
+  comments: disable
+
+ignore: |
+  docker/
+  .github/

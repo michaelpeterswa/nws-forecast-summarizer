@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -eo pipefail
+
+echo "running yamllint against repository"
+yamllint -s .
+
+echo "running hadolint against Dockerfile"
+hadolint Dockerfile
