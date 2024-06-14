@@ -6,6 +6,9 @@ pub struct Config {
     pub api_port: u16,
     pub metrics_host: String,
     pub metrics_port: u16,
+    pub ollama_host: String,
+    pub ollama_port: u16,
+    pub ollama_model: String,
 }
 
 impl Config {
@@ -15,6 +18,9 @@ impl Config {
         api_port: u16,
         metrics_host: String,
         metrics_port: u16,
+        ollama_host: String,
+        ollama_port: u16,
+        ollama_model: String,
     ) -> Self {
         Self {
             log_level,
@@ -22,6 +28,9 @@ impl Config {
             api_port,
             metrics_host,
             metrics_port,
+            ollama_host,
+            ollama_port,
+            ollama_model,
         }
     }
 }
@@ -32,8 +41,20 @@ pub fn load() -> Config {
     let api_port = u16(get("API_PORT"));
     let metrics_host = get("METRICS_HOST");
     let metrics_port = u16(get("METRICS_PORT"));
+    let ollama_host = get("OLLAMA_HOST");
+    let ollama_port = u16(get("OLLAMA_PORT"));
+    let ollama_model = get("OLLAMA_MODEL");
 
-    Config::new(log_level, api_host, api_port, metrics_host, metrics_port)
+    Config::new(
+        log_level,
+        api_host,
+        api_port,
+        metrics_host,
+        metrics_port,
+        ollama_host,
+        ollama_port,
+        ollama_model,
+    )
 }
 
 fn get(key: &str) -> String {
