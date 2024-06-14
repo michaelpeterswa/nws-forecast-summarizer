@@ -8,11 +8,14 @@ services:
       - "8080:8080"
       - "8081:8081"
     environment:
-      LOG_LEVEL: debug
+      LOG_LEVEL: info
       API_HOST: 0.0.0.0
       API_PORT: 8080
       METRICS_HOST: 0.0.0.0
       METRICS_PORT: 8081
+      OLLAMA_HOST: http://localhost
+      OLLAMA_PORT: 11434
+      OLLAMA_MODEL: llama3
 
   prometheus:
     image: prom/prometheus

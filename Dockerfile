@@ -18,10 +18,10 @@ COPY . .
 RUN --mount=type=cache,target=/usr/local/cargo/registry \ 
     --mount=type=cache,target=/usr/local/cargo/git \
     --mount=type=cache,target=$SCCACHE_DIR,sharing=locked \
-    cargo build --release --bin rust-start
+    cargo build --release --bin nws-forecast-summarizer
 
 # hadolint ignore=DL3006
 FROM gcr.io/distroless/cc-debian12 AS stage-3
 WORKDIR /app
-COPY --from=stage-2 /app/target/release/rust-start /app/rust-start
-ENTRYPOINT ["/app/rust-start"]
+COPY --from=stage-2 /app/target/release/nws-forecast-summarizer /app/nws-forecast-summarizer
+ENTRYPOINT ["/app/nws-forecast-summarizer"]
