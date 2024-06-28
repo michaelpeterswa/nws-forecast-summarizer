@@ -9,6 +9,7 @@ use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE, USER_AGENT};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::error::Error;
+use tracing::info;
 
 use std::sync::Arc;
 
@@ -39,14 +40,12 @@ struct Coordinates {
 #[serde(rename_all = "camelCase")]
 pub struct Period {
     pub detailed_forecast: String,
-    pub dewpoint: Dewpoint,
     pub end_time: String,
     pub icon: String,
     pub is_daytime: bool,
     pub name: String,
     pub number: i64,
     pub probability_of_precipitation: ProbabilityOfPrecipitation,
-    pub relative_humidity: RelativeHumidity,
     pub short_forecast: String,
     pub start_time: String,
     pub temperature: i64,
@@ -82,7 +81,6 @@ pub struct SimplifiedForecastPeriod {
     pub detailed_forecast: String,
     pub end_time: String,
     pub name: String,
-    pub relative_humidity: String,
     pub start_time: String,
     pub temperature: String,
     pub wind_speed: String,
@@ -143,7 +141,10 @@ pub async fn forecast(
 
     let periods = match periods_result {
         Ok(periods) => periods,
-        Err(_) => return Err("error getting forecast periods"),
+        Err(e) => {
+            info!("error getting forecast periods: {}", e);
+            return Err("error forcast periods");
+        }
     };
 
     let mut simplified_forecast_periods: Vec<SimplifiedForecastPeriod> = Vec::new();
@@ -153,7 +154,6 @@ pub async fn forecast(
             detailed_forecast: period.detailed_forecast,
             end_time: period.end_time,
             name: period.name,
-            relative_humidity: format!("{}%", period.relative_humidity.value),
             start_time: period.start_time,
             temperature: format!("{}{}", period.temperature, period.temperature_unit),
             wind_speed: format!("{} {}", period.wind_speed, period.wind_direction),
@@ -295,6 +295,8 @@ async fn forecast_address_from_coordinates(
         .unwrap()
         .strip_suffix("\"")
         .unwrap();
+
+    info!("forecast URL: {}", forecast_url_cleaned.to_string());
 
     Ok(forecast_url_cleaned.to_string())
 }
